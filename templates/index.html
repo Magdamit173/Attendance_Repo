@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Attendance</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      background-color: lavender;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+      margin: 0;
+      color: #4b0082;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      margin: auto;
+      border: 2px solid #9370db;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #status {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      #reader {
+        max-width: 90vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>QR Attendance System</h1>
+  <div id="reader"></div>
+  <div id="status">Scan your QR code</div>
+
+  <script>
+    function sendData(qrData) {
+      fetch('/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qr_data: qrData })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const status = document.getElementById('status')
+        status.textContent = data.message
+        status.style.color = data.status === 'success' ? 'green' : 'red'
+      })
+      .catch(() => {
+        const status = document.getElementById('status')
+        status.textContent = 'Network error'
+        status.style.color = 'red'
+      })
+    }
+
+    const qrScanner = new Html5QrcodeScanner("reader", {
+      fps: 10,
+      qrbox: { width: 300, height: 300 }
+    })
+
+    qrScanner.render(qrCodeMessage => {
+      sendData(qrCodeMessage)
+    })
+  </script>
+</body>
+</html>
