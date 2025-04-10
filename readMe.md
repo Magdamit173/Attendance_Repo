@@ -1,5 +1,5 @@
 # Attendance QRCode Personal
-#### Version 0.01
+#### Version 0.0.1.1
 
 #### Setup
 
