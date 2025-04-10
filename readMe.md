@@ -37,8 +37,8 @@ pkg install clang libxml2 libxslt
 Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/Magdamit173/attendance-qrcode.git
-cd attendance-qrcode
+git clone https://github.com/Magdamit173/Attendance_Repo.git
+cd Attendance_Repo
 ```
 
 ### **4. Set up Python Virtual Environment**
