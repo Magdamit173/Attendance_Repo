@@ -5,6 +5,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 import os
+import json
 
 load_dotenv()
 
@@ -15,12 +16,32 @@ CORS(app)
 SPREADSHEET_URL = os.getenv("SPREADSHEET_URL")
 CREDENTIALS_FILE = os.getenv("CREDENTIALS_JSON", "credentials.json")
 
+# Function to load credentials either from file or environment variable
+def load_credentials():
+    if os.path.exists(CREDENTIALS_FILE):
+        # Load from the credentials file if it exists
+        with open(CREDENTIALS_FILE, 'r') as file:
+            return json.load(file)
+    else:
+        # Try loading from the environment variable if the file doesn't exist
+        credentials_json = os.getenv("CREDENTIALS_JSON")
+        if credentials_json:
+            return json.loads(credentials_json)
+        else:
+            raise ValueError("Credentials not found! Ensure 'CREDENTIALS_JSON' is set.")
+
 # Setup Google Sheets client
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
-client = gspread.authorize(creds)
-spreadsheet = client.open_by_url(SPREADSHEET_URL)
-worksheet = spreadsheet.get_worksheet(0)
+
+try:
+    creds_data = load_credentials()
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_data, scope)
+    client = gspread.authorize(creds)
+    spreadsheet = client.open_by_url(SPREADSHEET_URL)
+    worksheet = spreadsheet.get_worksheet(0)
+except Exception as e:
+    print(f"Error loading credentials: {e}")
+    exit(1)
 
 @app.route("/")
 def index():

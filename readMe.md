@@ -1,6 +1,6 @@
 
 # Attendance QRCode Personal
-#### Version 0.0.2
+#### Version 0.0.3
 
 ## Description
 This project is a Flask-based QR Code scanner for attendance tracking. It scans QR codes using the `html5-qrcode` library, verifies attendance, and logs the data (along with the time and date of scanning) into a Google Spreadsheet.
