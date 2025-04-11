@@ -6,6 +6,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 import os
 import json
+import pytz  # Import pytz
 
 load_dotenv()
 
@@ -59,7 +60,10 @@ def scan():
     if qr_data in existing_data:
         return jsonify({"status": "error", "message": "User already scanned"})
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Get current time in Philippine Time (PHT)
+    philippines_tz = pytz.timezone("Asia/Manila")
+    timestamp = datetime.now(philippines_tz).strftime("%Y-%m-%d %H:%M:%S")
+    
     worksheet.append_row([timestamp, qr_data])
     return jsonify({"status": "success", "message": "Attendance complete"})
 
@@ -70,4 +74,3 @@ def scan():
 if __name__ == "__main__":
     # Local development server only
     app.run(debug=True)
-
