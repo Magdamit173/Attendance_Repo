@@ -57,7 +57,14 @@
   <div id="status">Scan your QR code</div>
 
   <script>
+    let qrScannerEnabled = true; // Track if the scanner is enabled
+  
     function sendData(qrData) {
+      if (!qrScannerEnabled) return; // Prevent multiple requests
+  
+      // Disable the scanner while processing
+      qrScannerEnabled = false;
+  
       fetch('/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,25 +72,34 @@
       })
       .then(response => response.json())
       .then(data => {
-        const status = document.getElementById('status')
-        status.textContent = data.message
-        status.style.color = data.status === 'success' ? 'green' : 'red'
+        const status = document.getElementById('status');
+        status.textContent = data.message;
+        status.style.color = data.status === 'success' ? 'green' : 'red';
+  
+        // Re-enable the scanner after processing the response
+        setTimeout(() => {
+          qrScannerEnabled = true;
+        }, 2000); // Re-enable scanner after 2 seconds (adjust as needed)
       })
       .catch(() => {
-        const status = document.getElementById('status')
-        status.textContent = 'Network error'
-        status.style.color = 'red'
-      })
+        const status = document.getElementById('status');
+        status.textContent = 'Network error';
+        status.style.color = 'red';
+  
+        // Re-enable the scanner after error
+        qrScannerEnabled = true;
+      });
     }
-
+  
     const qrScanner = new Html5QrcodeScanner("reader", {
       fps: 10,
       qrbox: { width: 300, height: 300 }
-    })
-
+    });
+  
     qrScanner.render(qrCodeMessage => {
-      sendData(qrCodeMessage)
-    })
+      sendData(qrCodeMessage);
+    });
   </script>
+  
 </body>
 </html>
